@@ -9,7 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PWMVictorSPX;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -63,11 +63,31 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     double absolutePosition = brainmotorsensors.getIntegratedSensorAbsolutePosition();
+    double relativePosition = brainmotorsensors.getIntegratedSensorPosition();
     double velocity = brainmotorsensors.getIntegratedSensorVelocity();
-    SmartDashboard.putNumber("Encoder", absolutePosition);
+    double motorcontroltype = 0;
+    SmartDashboard.putNumber("Encoder absolute", absolutePosition);
+    SmartDashboard.putNumber("Encoder relative", relativePosition);
     SmartDashboard.putNumber("Velocity", velocity);
-    triggerposition = m_joystick.getRawAxis(kRightTriggerAxis);
-    brainmotor.set(triggerposition);
+
+    // triggerposition = m_joystick.getRawAxis(kRightTriggerAxis);
+    // brainmotor.set(triggerposition);
+
+    motorcontroltype = SmartDashboard.getNumber("motorcontroltype", 0);
+    if (motorcontroltype == 1.0)
+    {
+    brainmotor.set(ControlMode.Position,SmartDashboard.getNumber("motor_desiredposition", 0));
+    }
+    else if (motorcontroltype == 2.0)
+    {
+    // motor velocity is in  2048 ticks = 600 rpm
+    brainmotor.set(ControlMode.Position,SmartDashboard.getNumber("motor_desiredvelocity", 0));
+    }
+    else
+    {
+    brainmotor.set(ControlMode.Velocity, 0));
+    }
+
   }
 
   @Override
